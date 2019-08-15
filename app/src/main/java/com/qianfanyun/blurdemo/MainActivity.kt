@@ -1,8 +1,8 @@
 package com.qianfanyun.blurdemo
 
 import android.graphics.Color
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
 import com.qianfanyun.blurlib.BlurBg
 import com.qianfanyun.blurlib.BlurConfig
@@ -18,6 +18,8 @@ class MainActivity : AppCompatActivity() {
         BlurBg.blur(
             BlurConfig.into(imv_center)
                 .setBgCorner(50.0f)
+                .setBlurRadius(25)
+                .setBlurScale(0.5f)
                 .setNormalCoverColor(Color.parseColor("#22000000"))
                 .setPressedCoverColor(Color.parseColor("#99000000"))
                 .build()
