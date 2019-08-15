@@ -61,16 +61,26 @@ class BlurBg {
          * 获取ViewGroup的截图
          */
         private fun getBgBitmap(view: View): Bitmap {
-            val parent: ViewGroup = view.parent as ViewGroup
-            parent.buildDrawingCache()
-            return parent.drawingCache
+            var parentView: ViewGroup = view.parent as ViewGroup
+            while (parentView.parent != null
+                && parentView.parent is ViewGroup
+            ) {
+                parentView = parentView.parent as ViewGroup
+                if (parentView.id == R.id.content) {
+                    break
+                }
+            }
+            parentView.buildDrawingCache()
+            return parentView.drawingCache
         }
 
         /**
          * 对父布局进行裁剪,获取控件占据的部分
          */
         private fun cropBgBitmap(bitmap: Bitmap, view: View): Bitmap {
-            return Bitmap.createBitmap(bitmap, view.x.toInt(), view.y.toInt(), view.width, view.height)
+            val location = IntArray(2)
+            view.getLocationInWindow(location)
+            return Bitmap.createBitmap(bitmap, location[0], location[1], view.width, view.height)
         }
 
 
