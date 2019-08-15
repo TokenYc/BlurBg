@@ -3,10 +3,12 @@
 
 ```
 BlurBg.blur(
-            BlurConfig.into(imv_center)
-                .setBgCorner(50.0f)
-                .setNormalCoverColor(Color.parseColor("#22000000"))
-                .setPressedCoverColor(Color.parseColor("#99000000"))
-                .build()
-        )
+    BlurConfig.into(imv_center)
+        .setBgCorner(50.0f)
+        .setBlurRadius(25)
+        .setBlurScale(0.5f)
+        .setNormalCoverColor(Color.parseColor("#22000000"))
+        .setPressedCoverColor(Color.parseColor("#99000000"))
+        .build()
+)
 ```
