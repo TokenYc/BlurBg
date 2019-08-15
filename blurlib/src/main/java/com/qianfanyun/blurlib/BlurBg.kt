@@ -70,8 +70,11 @@ class BlurBg {
                     break
                 }
             }
+            view.visibility=View.INVISIBLE
             parentView.buildDrawingCache()
-            return parentView.drawingCache
+            val bitmap = parentView.drawingCache
+            view.visibility =View.VISIBLE
+            return bitmap
         }
 
         /**
