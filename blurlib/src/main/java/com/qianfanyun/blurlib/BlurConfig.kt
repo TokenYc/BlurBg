@@ -25,39 +25,39 @@ class BlurConfig @JvmOverloads constructor(
 
     class Builder(view: View) {
         private val view: View = view
-        var blurRadius: Int = 25
-        var blurScale: Float = 0.5f
-        var bgCorner: Float = 0.0f
-        var normalCoverColor: Int = 0
-        var pressedCoverColor: Int = 0
+        var mBlurRadius: Int = 25
+        var mBlurScale: Float = 0.5f
+        var mBgCorner: Float = 0.0f
+        var mNormalCoverColor: Int = 0
+        var mPressedCoverColor: Int = 0
 
         fun setBlurRadius(blurRadius: Int): Builder {
-            this.blurRadius = blurRadius
+            this.mBlurRadius = blurRadius
             return this
         }
 
         fun setBlurScale(blurScale: Float): Builder {
-            this.blurScale = blurScale
+            this.mBlurScale = blurScale
             return this
         }
 
         fun setBgCorner(bgCorner: Float): Builder {
-            this.bgCorner = bgCorner
+            this.mBgCorner = bgCorner
             return this
         }
 
         fun setNormalCoverColor(normalCoverColor: Int): Builder {
-            this.normalCoverColor = normalCoverColor
+            this.mNormalCoverColor = normalCoverColor
             return this
         }
 
         fun setPressedCoverColor(pressedCoverColor: Int): Builder {
-            this.pressedCoverColor = pressedCoverColor
+            this.mPressedCoverColor = pressedCoverColor
             return this
         }
 
         fun build(): BlurConfig {
-            return BlurConfig(view, blurRadius, blurScale, bgCorner, normalCoverColor, pressedCoverColor)
+            return BlurConfig(view, mBlurRadius, mBlurScale, mBgCorner, mNormalCoverColor, mPressedCoverColor)
         }
     }
 }
