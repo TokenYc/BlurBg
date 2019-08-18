@@ -23,7 +23,7 @@ class BlurBg {
         fun blur(blurConfig: BlurConfig) {
 
             val targetView = blurConfig.view
-            targetView.post {
+            targetView.viewTreeObserver.addOnGlobalLayoutListener {
                 val bgBitmap = getBgBitmap(targetView)
                 val cropBitmap = cropBgBitmap(bgBitmap, targetView)
                 val blurBitmap = blur(
@@ -53,7 +53,6 @@ class BlurBg {
                     }
                     targetView.background = stateListDrawable
                 }
-
             }
         }
 
@@ -70,10 +69,10 @@ class BlurBg {
                     break
                 }
             }
-            view.visibility=View.INVISIBLE
+            view.visibility = View.INVISIBLE
             parentView.buildDrawingCache()
             val bitmap = parentView.drawingCache
-            view.visibility =View.VISIBLE
+            view.visibility = View.VISIBLE
             return bitmap
         }
 
