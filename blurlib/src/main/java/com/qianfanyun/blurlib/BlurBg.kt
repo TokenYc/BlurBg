@@ -24,6 +24,7 @@ class BlurBg {
 
             val targetView = blurConfig.view
             targetView.viewTreeObserver.addOnGlobalLayoutListener {
+                targetView.viewTreeObserver.removeOnGlobalLayoutListener {  }
                 val bgBitmap = getBgBitmap(targetView)
                 val cropBitmap = cropBgBitmap(bgBitmap, targetView)
                 val blurBitmap = blur(
