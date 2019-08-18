@@ -10,6 +10,7 @@ import android.renderscript.RenderScript
 import android.renderscript.ScriptIntrinsicBlur
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 
 /**
  * @date on 2019-08-15  18:48
@@ -23,38 +24,41 @@ class BlurBg {
         fun blur(blurConfig: BlurConfig) {
 
             val targetView = blurConfig.view
-            targetView.viewTreeObserver.addOnGlobalLayoutListener {
-                targetView.viewTreeObserver.removeOnGlobalLayoutListener {  }
-                val bgBitmap = getBgBitmap(targetView)
-                val cropBitmap = cropBgBitmap(bgBitmap, targetView)
-                val blurBitmap = blur(
-                    blurConfig.view.context, cropBitmap,
-                    blurConfig.blurRadius, blurConfig.blurScale
-                )
-                if (blurConfig.normalCoverColor == 0 && blurConfig.pressedCoverColor == 0) {
-                    val bitmap = bitmapRound(blurBitmap, blurConfig.bgCorner, blurConfig.normalCoverColor)
-                    targetView.background = BitmapDrawable(targetView.resources, bitmap)
-                } else {
-                    val stateListDrawable = StateListDrawable()
-                    val pressed: Int = android.R.attr.state_pressed
 
-                    if (blurConfig.normalCoverColor != 0) {
-                        val bitmapNormal = bitmapRound(blurBitmap, blurConfig.bgCorner, blurConfig.normalCoverColor)
-                        stateListDrawable.addState(
-                            IntArray(1) { -pressed },
-                            BitmapDrawable(targetView.resources, bitmapNormal)
-                        )
+            targetView.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+                override fun onGlobalLayout() {
+                    targetView.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                    val bgBitmap = getBgBitmap(targetView)
+                    val cropBitmap = cropBgBitmap(bgBitmap, targetView)
+                    val blurBitmap = blur(
+                        blurConfig.view.context, cropBitmap,
+                        blurConfig.blurRadius, blurConfig.blurScale
+                    )
+                    if (blurConfig.normalCoverColor == 0 && blurConfig.pressedCoverColor == 0) {
+                        val bitmap = bitmapRound(blurBitmap, blurConfig.bgCorner, blurConfig.normalCoverColor)
+                        targetView.background = BitmapDrawable(targetView.resources, bitmap)
+                    } else {
+                        val stateListDrawable = StateListDrawable()
+                        val pressed: Int = android.R.attr.state_pressed
+
+                        if (blurConfig.normalCoverColor != 0) {
+                            val bitmapNormal = bitmapRound(blurBitmap, blurConfig.bgCorner, blurConfig.normalCoverColor)
+                            stateListDrawable.addState(
+                                IntArray(1) { -pressed },
+                                BitmapDrawable(targetView.resources, bitmapNormal)
+                            )
+                        }
+                        if (blurConfig.pressedCoverColor != 0) {
+                            val bitmapPressed = bitmapRound(blurBitmap, blurConfig.bgCorner, blurConfig.pressedCoverColor)
+                            stateListDrawable.addState(
+                                IntArray(1) { pressed },
+                                BitmapDrawable(targetView.resources, bitmapPressed)
+                            )
+                        }
+                        targetView.background = stateListDrawable
                     }
-                    if (blurConfig.pressedCoverColor != 0) {
-                        val bitmapPressed = bitmapRound(blurBitmap, blurConfig.bgCorner, blurConfig.pressedCoverColor)
-                        stateListDrawable.addState(
-                            IntArray(1) { pressed },
-                            BitmapDrawable(targetView.resources, bitmapPressed)
-                        )
-                    }
-                    targetView.background = stateListDrawable
                 }
-            }
+            })
         }
 
         /**
