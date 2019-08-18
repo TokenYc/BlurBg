@@ -8,9 +8,11 @@ import android.renderscript.Allocation
 import android.renderscript.Element
 import android.renderscript.RenderScript
 import android.renderscript.ScriptIntrinsicBlur
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
+import android.widget.ImageView
 
 /**
  * @date on 2019-08-15  18:48
@@ -27,8 +29,10 @@ class BlurBg {
 
             targetView.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
                 override fun onGlobalLayout() {
+                    Log.d("test", System.currentTimeMillis().toString() + "")
+
                     targetView.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                    val bgBitmap = getBgBitmap(targetView)
+                    val bgBitmap = getBgBitmap(targetView, blurConfig.bgView)
                     val cropBitmap = cropBgBitmap(bgBitmap, targetView)
                     val blurBitmap = blur(
                         blurConfig.view.context, cropBitmap,
@@ -49,7 +53,8 @@ class BlurBg {
                             )
                         }
                         if (blurConfig.pressedCoverColor != 0) {
-                            val bitmapPressed = bitmapRound(blurBitmap, blurConfig.bgCorner, blurConfig.pressedCoverColor)
+                            val bitmapPressed =
+                                bitmapRound(blurBitmap, blurConfig.bgCorner, blurConfig.pressedCoverColor)
                             stateListDrawable.addState(
                                 IntArray(1) { pressed },
                                 BitmapDrawable(targetView.resources, bitmapPressed)
@@ -57,6 +62,7 @@ class BlurBg {
                         }
                         targetView.background = stateListDrawable
                     }
+                    Log.d("test", System.currentTimeMillis().toString() + "")
                 }
             })
         }
@@ -64,7 +70,8 @@ class BlurBg {
         /**
          * 获取ViewGroup的截图
          */
-        private fun getBgBitmap(view: View): Bitmap {
+        private fun getBgBitmap(view: View, bgView: View?): Bitmap {
+            val bitmap: Bitmap
             var parentView: ViewGroup = view.parent as ViewGroup
             while (parentView.parent != null
                 && parentView.parent is ViewGroup
@@ -74,10 +81,47 @@ class BlurBg {
                     break
                 }
             }
-            view.visibility = View.INVISIBLE
-            parentView.buildDrawingCache()
-            val bitmap = parentView.drawingCache
-            view.visibility = View.VISIBLE
+            if (bgView == null) {
+                view.visibility = View.INVISIBLE
+                parentView.buildDrawingCache()
+                bitmap = parentView.drawingCache
+                view.visibility = View.VISIBLE
+            } else {
+                if (bgView is ImageView) {
+                    val imageView = bgView
+                    val bitmapDrawable: BitmapDrawable = imageView.drawable as BitmapDrawable
+                    val originBitmap = bitmapDrawable.bitmap
+
+                    val matrix = Matrix()
+
+                    val ratioView = imageView.height.toFloat() / imageView.width.toFloat()
+                    val ratioBitmap = originBitmap.height.toFloat() / originBitmap.width.toFloat()
+
+                    val x: Int
+                    val y: Int
+                    val width: Int
+                    val height: Int
+                    val scale: Float
+                    if (ratioView > ratioBitmap) {
+                        width = (originBitmap.height.toFloat() / ratioView).toInt()
+                        x = ((originBitmap.width - width) / 2)
+                        y = 0
+                        height = originBitmap.height
+                    } else {
+                        x = 0
+                        width = originBitmap.width
+                        height = (originBitmap.width.toFloat() * ratioView).toInt()
+                        y = (originBitmap.height - height) / 2
+                    }
+                    scale = imageView.width.toFloat()/width.toFloat()
+                    matrix.preScale(scale,scale)
+                    bitmap = Bitmap.createBitmap(originBitmap, x, y, width, height, matrix, false)
+                } else {
+                    bgView.buildDrawingCache()
+                    bitmap = bgView.drawingCache
+                }
+
+            }
             return bitmap
         }
 

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import com.qianfanyun.blurlib.BlurConfig;
 public class TestFragment extends Fragment {
 
     ImageView imvCenter;
+    ImageView imvBg;
 
     public TestFragment() {
     }
@@ -30,6 +32,7 @@ public class TestFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_test, container, false);
+        imvBg = view.findViewById(R.id.imv_bg);
         imvCenter = view.findViewById(R.id.imv_center);
         return view;
     }
@@ -40,6 +43,7 @@ public class TestFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         BlurBg.Companion.blur(BlurConfig.Companion
                 .into(imvCenter)
+                .setBgView(imvBg)
                 .build());
     }
 }

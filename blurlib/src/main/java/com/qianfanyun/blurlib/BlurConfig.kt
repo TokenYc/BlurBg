@@ -9,6 +9,7 @@ import android.view.View
  */
 class BlurConfig @JvmOverloads constructor(
     val view: View,
+    val bgView: View?,
     val blurRadius: Int,
     val blurScale: Float,
     val bgCorner: Float,
@@ -25,6 +26,7 @@ class BlurConfig @JvmOverloads constructor(
 
     class Builder(view: View) {
         private val view: View = view
+        var mBgView: View? = null
         var mBlurRadius: Int = 25
         var mBlurScale: Float = 0.5f
         var mBgCorner: Float = 0.0f
@@ -56,8 +58,13 @@ class BlurConfig @JvmOverloads constructor(
             return this
         }
 
+        fun setBgView(bgView: View): Builder {
+            this.mBgView = bgView
+            return this
+        }
+
         fun build(): BlurConfig {
-            return BlurConfig(view, mBlurRadius, mBlurScale, mBgCorner, mNormalCoverColor, mPressedCoverColor)
+            return BlurConfig(view, mBgView, mBlurRadius, mBlurScale, mBgCorner, mNormalCoverColor, mPressedCoverColor)
         }
     }
 }
