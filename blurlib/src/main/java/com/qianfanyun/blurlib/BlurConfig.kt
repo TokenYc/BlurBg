@@ -1,5 +1,6 @@
 package com.qianfanyun.blurlib
 
+import android.graphics.Bitmap
 import android.view.View
 
 /**
@@ -10,6 +11,7 @@ import android.view.View
 class BlurConfig @JvmOverloads constructor(
     val view: View,
     val bgView: View?,
+    var bgBitmapHolder: Bitmap? = null,
     val blurRadius: Int,
     val blurScale: Float,
     val bgCorner: Float,
@@ -27,6 +29,7 @@ class BlurConfig @JvmOverloads constructor(
     class Builder(view: View) {
         private val view: View = view
         var mBgView: View? = null
+        var mBgBitmapHolder: Bitmap? = null
         var mBlurRadius: Int = 25
         var mBlurScale: Float = 0.5f
         var mBgCorner: Float = 0.0f
@@ -63,8 +66,22 @@ class BlurConfig @JvmOverloads constructor(
             return this
         }
 
+        fun setBgBitmapHolder(bgBitmapHolder: Bitmap?): Builder {
+            this.mBgBitmapHolder = bgBitmapHolder
+            return this
+        }
+
         fun build(): BlurConfig {
-            return BlurConfig(view, mBgView, mBlurRadius, mBlurScale, mBgCorner, mNormalCoverColor, mPressedCoverColor)
+            return BlurConfig(
+                view,
+                mBgView,
+                mBgBitmapHolder,
+                mBlurRadius,
+                mBlurScale,
+                mBgCorner,
+                mNormalCoverColor,
+                mPressedCoverColor
+            )
         }
     }
 }
