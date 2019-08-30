@@ -13,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.ImageView
+import java.lang.Exception
 
 /**
  * @date on 2019-08-15  18:48
@@ -40,7 +41,7 @@ class BlurBg {
                 bgBitmap = getBgBitmap(targetView, blurConfig.bgView)
                 blurConfig.bgBitmapHolder = bgBitmap
             }
-            val cropBitmap = cropBgBitmap(bgBitmap, targetView)
+            val cropBitmap = cropBgBitmap(bgBitmap, targetView) ?: return
             val blurBitmap = blur(
                 blurConfig.view.context, cropBitmap,
                 blurConfig.blurRadius, blurConfig.blurScale
@@ -49,14 +50,16 @@ class BlurBg {
                 cropBitmap.recycle()
             }
             if (blurConfig.normalCoverColor == 0 && blurConfig.pressedCoverColor == 0) {
-                val bitmap = bitmapRound(blurBitmap, blurConfig.bgCorner, blurConfig.normalCoverColor)
+                val bitmap =
+                    bitmapRound(blurBitmap, blurConfig.bgCorner, blurConfig.normalCoverColor)
                 targetView.background = BitmapDrawable(targetView.resources, bitmap)
             } else {
                 val stateListDrawable = StateListDrawable()
                 val pressed: Int = android.R.attr.state_pressed
 
                 if (blurConfig.normalCoverColor != 0) {
-                    val bitmapNormal = bitmapRound(blurBitmap, blurConfig.bgCorner, blurConfig.normalCoverColor)
+                    val bitmapNormal =
+                        bitmapRound(blurBitmap, blurConfig.bgCorner, blurConfig.normalCoverColor)
                     stateListDrawable.addState(
                         IntArray(1) { -pressed },
                         BitmapDrawable(targetView.resources, bitmapNormal)
@@ -144,10 +147,17 @@ class BlurBg {
         /**
          * 对父布局进行裁剪,获取控件占据的部分
          */
-        private fun cropBgBitmap(bitmap: Bitmap, view: View): Bitmap {
+        private fun cropBgBitmap(bitmap: Bitmap, view: View): Bitmap? {
             val location = IntArray(2)
             view.getLocationInWindow(location)
-            return Bitmap.createBitmap(bitmap, location[0], location[1], view.width, view.height)
+            try {
+                val cropBitmap =
+                    Bitmap.createBitmap(bitmap, location[0], location[1], view.width, view.height)
+                return cropBitmap
+            } catch (e: Exception) {
+                e.printStackTrace()
+                return null
+            }
         }
 
 
@@ -156,7 +166,8 @@ class BlurBg {
          */
 
         private fun bitmapRound(bitmap: Bitmap, corner: Float, coverColor: Int): Bitmap {
-            val targetBitmap = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
+            val targetBitmap =
+                Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
 
             val canvas = Canvas(targetBitmap)
             val paint = Paint()
@@ -197,7 +208,8 @@ class BlurBg {
             val output = Allocation.createTyped(renderScript, input.type)
 
             // Load up an instance of the specific script that we want to use.
-            val scriptIntrinsicBlur = ScriptIntrinsicBlur.create(renderScript, Element.U8_4(renderScript))
+            val scriptIntrinsicBlur =
+                ScriptIntrinsicBlur.create(renderScript, Element.U8_4(renderScript))
             scriptIntrinsicBlur.setInput(input)
 
             // Set the blur radius
