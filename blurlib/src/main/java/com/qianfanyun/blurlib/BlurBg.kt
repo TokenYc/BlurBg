@@ -34,11 +34,14 @@ class BlurBg {
 //
 //                    targetView.viewTreeObserver.removeOnGlobalLayoutListener(this)
 
-            val bgBitmap: Bitmap
+            val bgBitmap: Bitmap?
             if (blurConfig.bgBitmapHolder != null) {
                 bgBitmap = blurConfig.bgBitmapHolder!!
             } else {
                 bgBitmap = getBgBitmap(targetView, blurConfig.bgView)
+                if (bgBitmap == null) {
+                    return
+                }
                 blurConfig.bgBitmapHolder = bgBitmap
             }
             val cropBitmap = cropBgBitmap(bgBitmap, targetView) ?: return
@@ -86,8 +89,8 @@ class BlurBg {
         /**
          * 获取ViewGroup的截图
          */
-        fun getBgBitmap(view: View, bgView: View?): Bitmap {
-            val bitmap: Bitmap
+        fun getBgBitmap(view: View, bgView: View?): Bitmap? {
+            val bitmap: Bitmap?
             var parentView: ViewGroup = view.parent as ViewGroup
             while (parentView.parent != null
                 && parentView.parent is ViewGroup
@@ -108,7 +111,7 @@ class BlurBg {
             return bitmap
         }
 
-        fun getBgBitmap(bgView: View): Bitmap {
+        fun getBgBitmap(bgView: View): Bitmap? {
             if (bgView is ImageView) {
                 val imageView = bgView
                 val bitmapDrawable: BitmapDrawable = imageView.drawable as BitmapDrawable
@@ -136,7 +139,13 @@ class BlurBg {
                 }
                 scale = imageView.width.toFloat() / width.toFloat()
                 matrix.preScale(scale, scale)
-                return Bitmap.createBitmap(originBitmap, x, y, width, height, matrix, false)
+                try {
+                    val bgBitmap =
+                        Bitmap.createBitmap(originBitmap, x, y, width, height, matrix, false)
+                    return bgBitmap
+                } catch (e: Exception) {
+                    return null
+                }
             } else {
                 bgView.buildDrawingCache()
                 return bgView.drawingCache
@@ -166,9 +175,13 @@ class BlurBg {
          */
 
         private fun bitmapRound(bitmap: Bitmap, corner: Float, coverColor: Int): Bitmap {
-            val targetBitmap =
-                Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
-
+            val targetBitmap: Bitmap
+            try {
+                targetBitmap =
+                    Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
+            } catch (e: Exception) {
+                return bitmap
+            }
             val canvas = Canvas(targetBitmap)
             val paint = Paint()
             paint.isAntiAlias = true
