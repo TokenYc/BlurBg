@@ -114,6 +114,10 @@ class BlurBg {
         fun getBgBitmap(bgView: View): Bitmap? {
             if (bgView is ImageView) {
                 val imageView = bgView
+                val imageDrawable = imageView.drawable
+                if (imageDrawable==null){
+                    return null
+                }
                 val bitmapDrawable: BitmapDrawable = imageView.drawable as BitmapDrawable
                 val originBitmap = bitmapDrawable.bitmap
 

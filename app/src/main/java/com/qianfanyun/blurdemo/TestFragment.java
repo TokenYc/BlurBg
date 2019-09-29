@@ -54,9 +54,12 @@ public class TestFragment extends Fragment {
             public void onGlobalLayout() {
                 imvBg.getViewTreeObserver().removeOnGlobalLayoutListener(this);
 //                bitmapHolder = BlurBg.Companion.getBgBitmap(imvBg);
+                Bitmap bgBitmap = null;
+
                 BlurBg.Companion.blur(BlurConfig.Companion
                         .into(imvCenter)
                         .setBgView(imvBg)
+                        .setBgBitmapHolder(bgBitmap)
                         .setBgBitmapHolder(bitmapHolder)
                         .build());
 
